@@ -1,7 +1,10 @@
-# stock-intelligence-dashboard
-A modern, interactive Stock Intelligence Dashboard powered by FastAPI and Plotly. Provides real-time analytics, price trends, and machine learning forecasts for major global companies using live financial data. Includes RESTful APIs, modular backend, and a user-friendly web interface for deep stock insights and interactive visualization.
+📊 Stock Intelligence Dashboard
 
-Table of Contents
+A modern, interactive stock analytics platform powered by FastAPI, Plotly, and Machine Learning.
+It delivers real-time stock insights, historical trends, correlation analysis, forecasts, volatility metrics, and more — all wrapped in a clean, user-friendly dashboard.
+
+📌 Table of Contents
+
 Features
 
 Setup Instructions
@@ -14,122 +17,162 @@ Frontend Dashboard Overview
 
 Insights & Example Analytics
 
-Extending/Deployment
+🚀 Features
 
-Credits
+Live stock market data using Yahoo Finance (yfinance)
 
-Features
-Live stock data via Yahoo Finance API (yfinance)
+RESTful API with scalable FastAPI endpoints
 
-RESTful backend APIs for data retrieval, statistics, trend forecasting, comparison, and volatility
+Interactive dashboard built with HTML, CSS & Plotly
 
-Interactive dashboard for data and chart visualization
+Linear Regression model for 7-day price predictions
 
-Linear regression-based 7-day price predictions
+Correlation analysis between any two stocks
 
-Data download/export (.csv)
+Volatility measurement, comparison metrics, and summary statistics
 
-Modular, scalable and easy to run locally
+Clean, modular backend with clearly separated routes
 
-Setup Instructions
-Prerequisites:
+CSV export, dynamic charts, and interactive data visualization
 
-Python 3.8 or higher
+Lightweight, easy to deploy, and beginner-friendly
 
-Steps:
+⚙️ Setup Instructions
+Prerequisites
 
-Clone the repository
+Python 3.8+
 
-bash
+1. Clone the Repository
 git clone https://github.com/Pavanu padhyay27/stock-intelligence-dashboard
 cd stock-intelligence-dashboard
-Create and activate a virtual environment (recommended)
 
-bash
+2. Create & Activate Virtual Environment
 python -m venv venv
-# On Windows:
+
+
+Windows:
+
 venv\Scripts\activate
-# On Mac/Linux:
+
+
+macOS/Linux:
+
 source venv/bin/activate
-Install dependencies
 
-bash
+3. Install Dependencies
 pip install -r requirements.txt
-Run the backend API server
 
-bash
+4. Run FastAPI Server
 uvicorn app:app --reload
-Open your browser and visit:
 
-text
+5. Open Dashboard
+
+Visit in browser:
+
 http://127.0.0.1:8000/web/index.html
-Project Structure
-text
+
+🗂 Project Structure
 .
-├── app.py
-├── requirements.txt
+├── app.py                 # Backend API (FastAPI)
+├── requirements.txt       # Python dependencies
 ├── web/
-│   └── index.html
+│   └── index.html         # Frontend dashboard (Plotly)
 └── README.md
-Core Logic & API Endpoints
-Backend:
-Built using FastAPI, Pandas, and scikit-learn.
 
-/companies: Returns supported stock symbols.
+🧠 Core Logic & API Endpoints
 
-/data: Returns historical price & volume data for a company.
+Backend uses FastAPI, Pandas, yfinance, and scikit-learn.
 
-/summary: Returns 52-week high/low/average close.
+Available Endpoints
+Endpoint	Description
+/companies	List of supported stock symbols
+/data	Historical data (Open, Close, Volume)
+/summary	52-week high, 52-week low, average close
+/predict	ML-based 7-day price forecast
+/correlation	Pearson correlation of two stock trends
+/compare	Compare two stocks’ average close prices
+/volatility	Standard deviation of closing prices
+/download	Export full dataset as CSV
+/plot	Static PNG plot of closing price
 
-/predict: Returns a 7-day price forecast (linear regression).
+🔍 Key Data Processing Steps
 
-/correlation: Returns Pearson correlation between two companies.
+Fetches data using yfinance
+Cleans missing values & normalizes columns
+Computes:
+Daily Returns
+7-Day Moving Average
+Linear Regression forecasting using time-indexed price series
+Converts results to JSON for frontend visualization
 
-/compare: Compares average closing price between two companies.
+🖥️ Frontend Dashboard Overview
+What Users Can Do
 
-/volatility: Returns the standard deviation of daily close prices.
+Select companies:
+TSLA, MSFT, INFY.NS, TCS.NS, RELIANCE.NS, META, GOOGL, AAPL, AMZN
 
-/download: Download full price history as CSV.
+Filter data by period: 30 / 90 / 365 days
 
-/plot: Returns a static closing price plot image.
+View:
 
-Key data processing steps:
+Interactive closing price charts
 
-Data fetched using yfinance, cleaned with Pandas
+Volume overlays
 
-New columns created: Daily Return, 7-day Moving Average
+Key statistics
 
-Forecast uses scikit-learn LinearRegression on time-indexed price series
+Generate a 7-Day forecast using ML
 
-Frontend Dashboard Overview
-Company selector: View data for TSLA, MSFT, INFY.NS, TCS.NS, RELIANCE.NS, META, GOOGL, AAPL, AMZN
+Analyze trends visually through Plotly charts
 
-Period filter: Choose last 30, 90, or 365 days
+📈 Insights & Example Analytics
 
-Key stats panel: 52-week high, low, average close
+<img width="1919" height="914" alt="image" src="https://github.com/user-attachments/assets/c903eac9-7c7f-456d-bf42-17b0b33e0de6" />
+<img width="1904" height="905" alt="image" src="https://github.com/user-attachments/assets/15a3b832-e8a6-47d4-abb2-a11f11d0beee" />
+<img width="1907" height="897" alt="image" src="https://github.com/user-attachments/assets/847e430a-b813-4119-8551-d84ccbc8aeb8" />
+<img width="1919" height="899" alt="image" src="https://github.com/user-attachments/assets/e9b64468-b129-4697-812c-6ce169778c69" />
+<img width="1917" height="885" alt="image" src="https://github.com/user-attachments/assets/13660528-01ac-475d-ba78-76c97814b33f" />
 
-Charts: Interactive Plotly chart of price and volume
 
-Show 7-Day Forecast: Generates and plots predicted prices for upcoming days
 
-Insights & Example Analytics
-Each dashboard view offers distinct business insights.
-Keep the tone professional—sample summaries provided below for your screenshots or detailed analysis:
 
-TSLA (Tesla)
-Summary: TSLA has demonstrated significant volatility throughout 2023, with multiple peaks and corrections. The 52-week range emphasizes its role as a growth-oriented but unpredictable asset. Price forecasts indicate a short-term upswing aligned with current momentum and volume trends.
 
-MSFT (Microsoft)
-Summary: MSFT illustrates strong and consistent growth, with limited sharp declines. The correlation analysis with other tech giants can identify diversification opportunities for portfolios. Moving average smooths minor daily fluctuations, revealing a resilient uptrend.
+📌 TSLA (Tesla)
 
-RELIANCE.NS (Reliance Industries)
-Summary: The price trajectory reflects industry-wide events and sectoral shifts. Notable periods of volume spikes correspond to market-wide news. Volatility score should be considered by investors seeking exposure in emerging markets.
+Tesla shows high volatility and aggressive price swings throughout 2023.
+Patterns indicate speculative trading behavior and strong sensitivity to market news.
+Forecasts typically project short-term upward momentum after strong volume buildup.
 
-AAPL (Apple)
-Summary: Apple's steady climb and moderate volatility suggest strong investor confidence. The prediction model projects continued growth.
+📌 MSFT (Microsoft)
 
-INFY.NS, TCS.NS (Indian IT Majors)
-Summary: Both INFY and TCS show sectoral stability and healthy average closes. Weekly moving averages help visualize earnings and dividend impacts.
+Microsoft maintains a stable upward trend with low volatility.
+Its 52-week range shows consistent investor confidence and minimal corrective dips.
+Correlation with other tech giants provides insights for portfolio diversification.
 
-META (Meta/Facebook), GOOGL (Alphabet/Google), AMZN (Amazon)
-Summary: All three display classic large-cap tech movement—periods of growth, correction, and recovery. Forecasts and correlation analyses provide valuable context for multi-asset strategies.
+📌 RELIANCE.NS (Reliance Industries)
+
+Price movement reflects sector-driven trends in energy and telecom markets.
+Volume spikes often align with corporate announcements or policy changes.
+Volatility is moderate, suitable for medium-risk portfolios.
+
+📌 AAPL (Apple)
+
+Apple demonstrates a smooth growth trajectory with controlled volatility.
+Weekly moving averages indicate strong institutional support.
+Forecasts often extend the ongoing slow-and-steady climb.
+
+📌 Indian IT: INFY.NS / TCS.NS
+
+Both companies show sectoral stability, with predictable earnings cycles.
+Moving averages reveal periodic dips during earnings announcements.
+Good examples of low-volatility tech investments.
+
+📌 META, GOOGL, AMZN
+
+These companies exhibit:
+
+High liquidity
+
+Strong correlation inside the tech sector
+
+Clear long-term growth with short-term volatilitysic large-cap tech movement—periods of growth, correction, and recovery. Forecasts and correlation analyses provide valuable context for multi-asset strategies.
