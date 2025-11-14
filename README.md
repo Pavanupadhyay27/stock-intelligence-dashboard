@@ -1,7 +1,7 @@
 📊 Stock Intelligence Dashboard
 
 A modern, interactive stock analytics platform powered by FastAPI, Plotly, and Machine Learning.
-It delivers real-time stock insights, historical trends, correlation analysis, forecasts, volatility metrics, and more — all wrapped in a clean, user-friendly dashboard.
+It delivers historical trends, correlation analysis, forecasts, volatility metrics, and more — all wrapped in a clean, user-friendly dashboard.
 
 📌 Table of Contents
 
