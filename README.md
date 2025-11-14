@@ -43,7 +43,7 @@ Prerequisites
 Python 3.8+
 
 1. Clone the Repository
-git clone https://github.com/Pavanu padhyay27/stock-intelligence-dashboard
+git clone https://github.com/Pavanupadhyay27/stock-intelligence-dashboard
 cd stock-intelligence-dashboard
 
 2. Create & Activate Virtual Environment
