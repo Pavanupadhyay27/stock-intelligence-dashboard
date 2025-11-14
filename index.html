@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Stock Intelligence Dashboard</title>
+    <!-- Plotly CDN -->
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css?family=Roboto:400,700" rel="stylesheet">
+    <style>
+        body { font-family: 'Roboto', Arial, sans-serif; background: #f6f8fa; margin: 0; }
+        header { background: #1476f2; color: #fff; padding: 16px 28px; box-shadow: 0 2px 8px #e6ecfa; margin-bottom: 0; }
+        #main-wrapper { display: flex; min-height: 100vh; }
+        #sidebar { background: #fff; border-right: 1px solid #e3eaf6; padding: 22px 16px 16px 16px; box-shadow: 0 2px 8px #dde; min-width: 200px; }
+        #chart { flex: 1; padding: 36px 48px 20px 32px; }
+        h3, label { color: #235; margin-bottom: 10px; }
+        ul#companies { list-style: none; padding: 0; }
+        ul#companies li { margin: 8px 0; cursor: pointer; padding: 7px 22px; border-radius: 6px; transition: background .2s, font-weight .2s; }
+        ul#companies li:hover, ul#companies li.active { background: #e3f1ff; font-weight: bold; }
+        select { margin-top: 12px; padding: 6px; border-radius: 4px; border: 1px solid #bbc; }
+        #stats { background: #fff; border-radius: 7px; box-shadow: 0 2px 6px #dee; padding: 18px 20px; margin-bottom: 22px; display: inline-block; min-width:200px; }
+        #forecast-plot { margin-top: 30px; }
+        #predict-btn { padding: 8px 18px; margin-bottom: 18px; margin-top:5px; background: #1476f2; color: #fff; border:none; border-radius:4px; cursor: pointer; font-size: 16px; }
+        #predict-btn:hover { background: #105ec2; }
+        footer { padding: 10px 36px; background: #eff5fd; color: #88b; font-size: 15px; letter-spacing: .5px; }
+    </style>
+</head>
+<body>
+    <header>
+        <h2>Stock Intelligence Dashboard</h2>
+    </header>
+    <div id="main-wrapper">
+      <div id="sidebar">
+          <h3>Companies</h3>
+          <ul id="companies"></ul>
+          <label for="period">Period:</label>
+          <select id="period">
+              <option value="30">Last 30</option>
+              <option value="90">Last 90</option>
+              <option value="365">Last 365</option>
+          </select>
+      </div>
+      <div id="chart">
+          <div id="stats"></div>
+          <h3 id="selected-symbol"></h3>
+          <button id="predict-btn">Show 7-Day Forecast</button>
+          <div id="plot"></div>
+          <div id="forecast-plot"></div>
+      </div>
+    </div>
+        <script>
+    // Load company list & set sidebar
+    fetch('/companies')
+        .then(r => r.json())
+        .then(data => {
+            const ul = document.getElementById('companies');
+            data.companies.forEach(symbol => {
+                let li = document.createElement('li');
+                li.textContent = symbol;
+                li.style.cursor = 'pointer';
+                li.onclick = () => {
+                    document.querySelectorAll('#companies li').forEach(el => el.classList.remove('active'));
+                    li.classList.add('active');
+                    loadStock(symbol);
+                    // Also clear forecast plot when new symbol loaded
+                    document.getElementById('forecast-plot').innerHTML = '';
+                };
+                ul.appendChild(li);
+            });
+            if (data.companies.length > 0) {
+                ul.firstChild.classList.add('active');
+                loadStock(data.companies[0]);
+            }
+        });
+
+    function loadStock(symbol) {
+        document.getElementById('selected-symbol').textContent = symbol;
+        let period = document.getElementById('period').value;
+        document.getElementById('stats').innerHTML = 'Loading...';
+        fetch(`/data?symbol=${symbol}&period=${period}`)
+            .then(r => r.json())
+            .then(d => {
+                let x = d.map(v => v['Date'] || v['date'] || v['Datetime'] || v['index']);
+                let y = d.map(v => v['Close'] || v['close']);
+                let bars = d.map(v => v['Volume'] || v['volume'] || 0);
+                let hasVolume = bars.some(v => v > 0);
+                let traces = [];
+                if (hasVolume) {
+                    traces.push({
+                        x: x,
+                        y: bars,
+                        type: 'bar',
+                        name: 'Volume',
+                        marker: {opacity: 0.3, color: '#86b7e7'},
+                        yaxis: 'y2'
+                    });
+                }
+                traces.push({
+                    x: x,
+                    y: y,
+                    type: 'scatter',
+                    mode: 'lines',
+                    name: 'Close Price',
+                    line: {color: '#1f77b4'}
+                });
+                let layout = {
+                  title: `Close Price${hasVolume ? ' & Volume' : ''}: ${symbol}`,
+                  yaxis: {title: 'Close Price', side: 'left'},
+                  yaxis2: hasVolume ? {
+                    title: 'Volume',
+                    overlaying: 'y',
+                    side: 'right',
+                    showgrid: false,
+                    zeroline: false,
+                    rangemode: 'tozero',
+                    tickfont: {color: '#86b7e7'}
+                  } : undefined,
+                  barmode: hasVolume ? 'overlay' : undefined,
+                  legend: {x: 0.1, y: 1.2, orientation: 'h'},
+                  margin: {t: 40}
+                };
+                Plotly.newPlot('plot', traces, layout);
+                fetch(`/summary?symbol=${symbol}`)
+                  .then(r => r.json())
+                  .then(stats => {
+                    if(stats.error) {
+                      document.getElementById('stats').innerHTML = `<b>Symbol:</b> ${symbol}<br><span style='color:#c33;'>${stats.error}</span>`;
+                      return;
+                    }
+                    document.getElementById('stats').innerHTML =
+                      `<b>Symbol:</b> ${symbol}<br>`+
+                      `<b>52-Week High:</b> ${stats['52w_high'].toFixed(2)}<br>`+
+                      `<b>52-Week Low:</b> ${stats['52w_low'].toFixed(2)}<br>`+
+                      `<b>Average Close:</b> ${stats['average_close'].toFixed(2)}`;
+                  });
+            });
+    }
+
+    document.getElementById('period').onchange = function() {
+        let symbol = document.getElementById('selected-symbol').textContent;
+        if(symbol) loadStock(symbol);
+        document.getElementById('forecast-plot').innerHTML = '';
+    };
+
+    // Handle forecast (prediction) button click
+    document.getElementById('predict-btn').onclick = function() {
+        const symbol = document.getElementById('selected-symbol').textContent;
+        if(!symbol) return;
+        fetch(`/predict?symbol=${symbol}`)
+            .then(res => res.json())
+            .then(data => {
+                if(data.error || !data.forecast) {
+                    alert('Prediction error: ' + (data.error || 'No forecast data available'));
+                    return;
+                }
+                const predDates = data.forecast.map(d => d.Date);
+                const predValues = data.forecast.map(d => d.Predicted_Close);
+                Plotly.newPlot('forecast-plot', [
+                    {
+                        x: predDates,
+                        y: predValues,
+                        type: 'scatter',
+                        mode: 'lines+markers',
+                        name: '7-Day Forecast',
+                        line: {color:'#f57f17'},
+                        marker: {color:'#fbc02d'}
+                    }
+                ], {
+                    title: `7-Day Close Price Forecast for ${symbol}`,
+                    yaxis: {title: 'Predicted Close ($)'},
+                    xaxis: {title: 'Date'},
+                    margin: {t: 40}
+                });
+            });
+    };
+    </script>
+</body>
+</html>
+
+
+
+
+
